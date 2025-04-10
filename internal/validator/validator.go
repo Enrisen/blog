@@ -54,3 +54,23 @@ func MinLength(value string, n int) bool {
 func IsValidEmail(email string) bool {
 	return EmailRX.MatchString(email)
 }
+
+// ValidateUserRegistration validates the user registration form data
+func (v *Validator) ValidateUserRegistration(name, email, password, confirmPassword string) {
+	// Validate name
+	v.Check(NotBlank(name), "name", "Name cannot be empty")
+	v.Check(MaxLength(name, 100), "name", "Name cannot be more than 100 characters")
+
+	// Validate email
+	v.Check(NotBlank(email), "email", "Email cannot be empty")
+	v.Check(IsValidEmail(email), "email", "Please enter a valid email address")
+	v.Check(MaxLength(email, 255), "email", "Email cannot be more than 255 characters")
+
+	// Validate password
+	v.Check(NotBlank(password), "password", "Password cannot be empty")
+	v.Check(MinLength(password, 8), "password", "Password must be at least 8 characters")
+
+	// Validate password confirmation
+	v.Check(NotBlank(confirmPassword), "confirm_password", "Please confirm your password")
+	v.Check(password == confirmPassword, "confirm_password", "Passwords do not match")
+}

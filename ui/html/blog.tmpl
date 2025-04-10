@@ -4,23 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechSphere | Information Technology Blog</title>
-    <!-- Tailwind for layout and utilities -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="/static/css/blog.css">
 </head>
 <body class="antialiased">
 
     <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+    <header class="bg-white shadow-md sticky top-0 z-50">
         <div class="container mx-auto px-6 py-4">
             <div class="flex justify-between items-center">
                 <!-- Logo -->
-                <a href="/" class="text-2xl font-heading font-bold tracking-tight">
+                <a href="#" class="text-2xl font-heading font-bold tracking-tight">
                     <span class="text-accent">Tech</span>Sphere
                 </a>
 
@@ -34,7 +30,7 @@
                     <a href="#" class="text-gray-600 hover:text-accent">Contact</a>
                     <!-- Search -->
                     <div class="relative">
-                        <input type="search" placeholder="Search..." class="px-4 py-2 border border-light rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
+                        <input type="search" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
                         <button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-accent">
                             <i class="fas fa-search"></i>
                         </button>
@@ -50,15 +46,15 @@
              <!-- Mobile Navigation (Hidden by default) -->
             <div id="mobile-menu" class="hidden md:hidden mt-4">
                 <nav class="flex flex-col space-y-2">
-                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b border-light">Software Dev</a>
-                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b border-light">Cybersecurity</a>
-                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b border-light">Cloud</a>
-                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b border-light">AI/ML</a>
-                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b border-light">About</a>
+                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b">Software Dev</a>
+                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b">Cybersecurity</a>
+                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b">Cloud</a>
+                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b">AI/ML</a>
+                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b">About</a>
                     <a href="#" class="py-2 text-gray-600 hover:text-accent">Contact</a>
                      <!-- Mobile Search -->
                     <div class="relative pt-2">
-                        <input type="search" placeholder="Search..." class="w-full px-4 py-2 border border-light rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
+                        <input type="search" placeholder="Search..." class="w-full px-4 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
                         <button class="absolute right-3 top-1/2 transform -translate-y-1/2 pt-2 text-gray-400 hover:text-accent">
                             <i class="fas fa-search"></i>
                         </button>
@@ -77,7 +73,7 @@
                 {{if .Posts}}
                     <!-- Featured Post (first post) -->
                     {{with index .Posts 0}}
-                    <article class="mb-12 card card-hover"> {/* Use card classes */}
+                    <article class="mb-12 card-hover bg-white rounded-lg shadow-lg overflow-hidden">
                         <a href="#">
                             <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80" alt="Featured Tech Post" class="w-full h-64 object-cover">
                         </a>
@@ -92,7 +88,7 @@
                             <h1 class="font-heading text-3xl font-bold mb-3 hover:text-accent transition">
                                 <a href="#">{{.Title}}</a>
                             </h1>
-                            <p class="text-text-secondary mb-4">{{.Excerpt}}</p> {/* Use text-secondary variable */}
+                            <p class="text-gray-600 mb-4">{{.Excerpt}}</p>
                             <div class="flex items-center text-sm text-gray-500">
                                 <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Author" class="w-8 h-8 rounded-full mr-2 object-cover">
                                 <span>By Admin</span>
@@ -111,7 +107,7 @@
                         {{range $index, $post := .Posts}}
                             {{if gt $index 0}}
                                 <!-- Post Card -->
-                                <article class="card card-hover"> {/* Use card classes */}
+                                <article class="card-hover bg-white rounded-lg shadow overflow-hidden">
                                     <a href="#">
                                         <img src="https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=800&q=80" alt="Post Image" class="w-full h-48 object-cover">
                                     </a>
@@ -126,9 +122,9 @@
                                         <h3 class="font-heading text-lg font-bold mb-2 hover:text-accent transition">
                                             <a href="#">{{$post.Title}}</a>
                                         </h3>
-                                        <p class="text-sm text-text-secondary mb-3">{{$post.Excerpt}}</p> {/* Use text-secondary variable */}
+                                        <p class="text-sm text-gray-600 mb-3">{{$post.Excerpt}}</p>
                                         <div class="text-xs text-gray-500">
-                                            <span>{{$post.CreatedAt.Format "Jan 2, 2006"}}</span> <span class="mx-1">•</span> <span>{{$post.ViewCount}} views</span> {/* Shortened date format */}
+                                            <span>{{$post.CreatedAt.Format "January 2, 2006"}}</span> <span class="mx-1">•</span> <span>{{$post.ViewCount}} views</span>
                                         </div>
                                     </div>
                                 </article>
@@ -137,10 +133,10 @@
                     </div>
                 {{else}}
                     <!-- No Posts Message -->
-                    <div class="card empty-state">
-                        <i class="fas fa-newspaper"></i>
-                        <h2>No Blog Posts Yet</h2>
-                        <p>We're working on creating amazing content for you. Check back soon for our latest articles!</p>
+                    <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+                        <i class="fas fa-newspaper text-5xl text-accent mb-4"></i>
+                        <h2 class="text-2xl font-bold mb-2">No Blog Posts Yet</h2>
+                        <p class="text-gray-600 mb-4">We're working on creating amazing content for you. Check back soon for our latest articles!</p>
                     </div>
                 {{end}}
 
@@ -148,11 +144,11 @@
                 {{if .Posts}}
                 <div class="mt-12 flex justify-center">
                     <nav class="flex space-x-2" aria-label="Pagination">
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-light rounded-md hover:bg-gray-50">Previous</a>
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-light rounded-md hover:bg-gray-50">1</a>
+                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Previous</a>
+                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">1</a>
                         <a href="#" aria-current="page" class="relative z-10 inline-flex items-center px-4 py-2 text-sm font-medium text-accent border border-accent bg-blue-50 rounded-md">2</a>
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-light rounded-md hover:bg-gray-50">3</a>
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-light rounded-md hover:bg-gray-50">Next</a>
+                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">3</a>
+                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Next</a>
                     </nav>
                 </div>
                 {{end}}
@@ -161,11 +157,11 @@
 
             <!-- Sidebar Column -->
             <aside class="w-full lg:w-1/3">
-                <div class="sticky top-24 space-y-8">
+                <div class="sticky top-24 space-y-8"> {/* Adjust top value based on header height */}
 
                     <!-- Categories Widget -->
-                    <div class="sidebar-widget">
-                        <h3>Categories</h3>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="font-heading text-lg font-semibold mb-4 border-b pb-2">Categories</h3>
                         <ul class="space-y-1">
                             <li><a href="#" class="sidebar-link">Software Development (15)</a></li>
                             <li><a href="#" class="sidebar-link">Cybersecurity (8)</a></li>
@@ -177,8 +173,8 @@
                     </div>
 
                     <!-- Recent Posts Widget -->
-                    <div class="sidebar-widget">
-                        <h3>Recent Posts</h3>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="font-heading text-lg font-semibold mb-4 border-b pb-2">Recent Posts</h3>
                         <ul class="space-y-3">
                             {{range $index, $post := .Posts}}
                                 {{if lt $index 4}}
@@ -191,26 +187,26 @@
                     </div>
 
                      <!-- Tags Widget -->
-                    <div class="sidebar-widget">
-                        <h3>Tags</h3>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="font-heading text-lg font-semibold mb-4 border-b pb-2">Tags</h3>
                         <div class="flex flex-wrap gap-2">
-                            <a href="#" class="tag-link">Docker</a>
-                            <a href="#" class="tag-link">Security</a>
-                            <a href="#" class="tag-link">AWS</a>
-                            <a href="#" class="tag-link">Microservices</a>
-                            <a href="#" class="tag-link">Python</a>
-                            <a href="#" class="tag-link">JavaScript</a>
-                            <a href="#" class="tag-link">Serverless</a>
+                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">Docker</a>
+                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">Security</a>
+                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">AWS</a>
+                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">Microservices</a>
+                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">Python</a>
+                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">JavaScript</a>
+                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">Serverless</a>
                         </div>
                     </div>
 
                     <!-- Newsletter Widget -->
-                    <div class="newsletter-widget">
-                        <h3>Stay Updated</h3>
-                        <p>Get the latest tech news and tutorials straight to your inbox.</p>
+                    <div class="bg-accent p-6 rounded-lg shadow text-white">
+                        <h3 class="font-heading text-lg font-semibold mb-3">Stay Updated</h3>
+                        <p class="text-sm mb-4 opacity-90">Get the latest tech news and tutorials straight to your inbox.</p>
                         <form>
-                            <input type="email" placeholder="your.email@example.com" class="focus:outline-none focus:ring-2 focus:ring-white">
-                            <button type="submit">Subscribe</button>
+                            <input type="email" placeholder="your.email@example.com" class="w-full px-4 py-2 rounded border border-transparent text-gray-800 focus:outline-none focus:ring-2 focus:ring-white mb-3">
+                            <button type="submit" class="w-full px-4 py-2 bg-white text-accent font-semibold rounded hover:bg-gray-100 transition">Subscribe</button>
                         </form>
                     </div>
 
@@ -225,7 +221,7 @@
         <div class="container mx-auto px-6 py-8">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="text-center md:text-left mb-4 md:mb-0">
-                    <p>&copy; 2025 Enrisen Tzib. All rights reserved.</p>
+                    <p>&copy; 2025 TechSphere Blog. All rights reserved.</p>
                     <div class="text-sm mt-1">
                         <a href="#" class="hover:text-white transition">About</a> |
                         <a href="#" class="hover:text-white transition">Contact</a> |

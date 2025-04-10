@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Successful | TechSphere</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/blog.css">
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <a href="/" class="text-2xl font-heading font-bold tracking-tight">
+                    <span class="text-accent">Tech</span>Sphere
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="text-gray-600 hover:text-accent">Software Dev</a>
+                    <a href="#" class="text-gray-600 hover:text-accent">Cybersecurity</a>
+                    <a href="#" class="text-gray-600 hover:text-accent">Cloud</a>
+                    <a href="#" class="text-gray-600 hover:text-accent">AI/ML</a>
+                    <a href="#" class="text-gray-600 hover:text-accent">About</a>
+                    <a href="#" class="text-gray-600 hover:text-accent">Contact</a>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button id="menu-toggle" class="md:hidden focus:outline-none">
+                    <i class="fas fa-bars text-xl text-gray-600"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation (Hidden by default) -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4">
+                <nav class="flex flex-col space-y-2">
+                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b">Software Dev</a>
+                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b">Cybersecurity</a>
+                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b">Cloud</a>
+                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b">AI/ML</a>
+                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b">About</a>
+                    <a href="#" class="py-2 text-gray-600 hover:text-accent">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="container mx-auto px-6 py-12">
+        <div class="success-container">
+            <div class="success-icon">✓</div>
+            <h2>Registration Successful!</h2>
+            <p>Your account has been created successfully.</p>
+            <p>You can now log in with your email and password.</p>
+            <div class="action-buttons">
+                <a href="/" class="btn-secondary">Go to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-gray-300 mt-16">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-center md:text-left mb-4 md:mb-0">
+                    <p>&copy; 2025 TechSphere Blog. All rights reserved.</p>
+                    <div class="text-sm mt-1">
+                        <a href="#" class="hover:text-white transition">About</a> |
+                        <a href="#" class="hover:text-white transition">Contact</a> |
+                        <a href="#" class="hover:text-white transition">Privacy Policy</a> |
+                        <a href="#" class="hover:text-white transition">Terms of Service</a>
+                    </div>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white transition text-xl">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition text-xl">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition text-xl">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition text-xl">
+                        <i class="fas fa-rss"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

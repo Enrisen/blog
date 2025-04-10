@@ -17,6 +17,7 @@ type application struct {
 	logger        *slog.Logger
 	addr          *string
 	blog          *data.BlogModel
+	users         *data.UserModel
 	templateCache map[string]*template.Template
 }
 
@@ -47,6 +48,7 @@ func main() {
 		logger:        logger,
 		addr:          addr,
 		blog:          &data.BlogModel{DB: blogDB},
+		users:         &data.UserModel{DB: blogDB},
 		templateCache: templateCache,
 	}
 

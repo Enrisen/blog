@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/blog.css">
+</head>
+<body class="antialiased">
+    <div class="container mx-auto px-6 py-12">
+        <div class="empty-state">
+            <i class="fas fa-check-circle"></i>
+            <h2>Post Published Successfully!</h2>
+            <p>Your blog post has been published and is now available for readers.</p>
+            <div class="mt-6">
+                <a href="/blog" class="bg-accent text-white px-6 py-3 rounded-md hover:bg-accent-dark transition">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Blog
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Redirect to blog page after 3 seconds
+            setTimeout(function() {
+                window.location.href = '/blog';
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
