@@ -1,46 +1,79 @@
 package main
 
 import (
+	"context"
+	"database/sql"
+	"flag"
 	"html/template"
-	"log"
-	"net/http"
-	"path/filepath"
+	"log/slog"
+	"os"
+	"time"
+
+	"github.com/Enrisen/blog/internal/data"
+	_ "github.com/lib/pq"
 )
 
-func main() {
-	// Define handler for the root path
-	http.HandleFunc("/", homeHandler)
+type application struct {
+	logger        *slog.Logger
+	addr          *string
+	blog          *data.BlogModel
+	templateCache map[string]*template.Template
+}
 
-	// Start the server
-	log.Println("Starting server on :4000")
-	err := http.ListenAndServe(":4000", nil)
+func main() {
+	addr := flag.String("addr", "", "HTTP network address")
+	blogDSN := flag.String("dsn", os.Getenv("it_blog_DB_DSN"), "Blog PostgreSQL DSN")
+
+	flag.Parse()
+
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+
+	// Open blog database connection
+	blogDB, err := openDB(*blogDSN)
 	if err != nil {
-		log.Fatal(err)
+		logger.Error("failed to open blog database", "error", err.Error())
+		os.Exit(1)
+	}
+	logger.Info("blog database connection pool established")
+
+	templateCache, err := newTemplateCache()
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+	defer blogDB.Close()
+
+	app := &application{
+		logger:        logger,
+		addr:          addr,
+		blog:          &data.BlogModel{DB: blogDB},
+		templateCache: templateCache,
+	}
+
+	err = app.serve()
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
 	}
 }
 
-// homeHandler renders the home page template
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	// Ensure only the root path is handled
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-
-	tmplPath := filepath.Join("ui", "html", "home.tmpl")
-
-	// Parse the template file
-	ts, err := template.ParseFiles(tmplPath)
+func openDB(dsn string) (*sql.DB, error) {
+	// open a connection pool
+	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		log.Printf("Error parsing template: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
+		return nil, err
 	}
 
-	// Execute the template
-	err = ts.Execute(w, nil) // Pass nil for data for now
+	// set a context to ensure DB operations don't take too long
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	err = db.PingContext(ctx)
 	if err != nil {
-		log.Printf("Error executing template: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		db.Close()
+		return nil, err
 	}
+
+	// return the connection pool (sql.DB)
+	return db, nil
+
 }
