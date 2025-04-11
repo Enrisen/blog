@@ -1,0 +1,45 @@
+/* Layout.css - Custom layout components that extend Tailwind */
+
+/* Navigation with animated underline effect */
+.nav-link {
+  position: relative;
+  transition: color var(--transition-fast);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary);
+  transition: width var(--transition-normal);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* Sticky sidebar */
+.sidebar-sticky {
+  position: sticky;
+  top: 5rem;
+}
+
+/* Social links with hover animation */
+.social-link {
+  transition: all var(--transition-fast);
+}
+
+.social-link:hover {
+  transform: translateY(-2px);
+}
+
+/* Content grid for main content and sidebar */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+}

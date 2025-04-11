@@ -6,32 +6,35 @@
     <title>TechSphere | Information Technology Blog</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/blog.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="/static/css/new/main.css">
 </head>
 <body class="antialiased">
 
     <!-- Header -->
-    <header class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex justify-between items-center">
+    <header class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-200">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
                 <!-- Logo -->
-                <a href="#" class="text-2xl font-heading font-bold tracking-tight">
-                    <span class="text-accent">Tech</span>Insights
+                <a href="/" class="flex items-center space-x-2 text-2xl font-bold tracking-tight">
+                    <i class="fas fa-microchip text-primary"></i>
+                    <span><span class="text-primary">Tech</span>Insights</span>
                 </a>
 
                 <!-- Desktop Navigation -->
-                <nav class="hidden md:flex items-center space-x-6">
-                    <a href="/" class="text-gray-600 hover:text-accent">Home</a>
-                    <a href="/" class="text-gray-600 hover:text-accent">Articles</a>
-                    <a href="#" class="text-gray-600 hover:text-accent">About</a>
-                    <a href="#" class="text-gray-600 hover:text-accent">Contact</a>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="/" class="nav-link text-gray-600 hover:text-primary">Home</a>
+                    <a href="/" class="nav-link text-gray-600 hover:text-primary">Articles</a>
+                    <a href="#" class="nav-link text-gray-600 hover:text-primary">About</a>
+                    <a href="#" class="nav-link text-gray-600 hover:text-primary">Contact</a>
                     <!-- Search -->
                     <div class="relative">
-                        <input type="search" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
-                        <button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-accent">
-                            <i class="fas fa-search"></i>
-                        </button>
+                        <form class="search-form">
+                            <input type="search" placeholder="Search..." class="pl-4 pr-10 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <button type="submit" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
                     </div>
                 </nav>
 
@@ -41,19 +44,21 @@
                 </button>
             </div>
 
-             <!-- Mobile Navigation (Hidden by default) -->
-            <div id="mobile-menu" class="hidden md:hidden mt-4">
+            <!-- Mobile Navigation (Hidden by default) -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 overflow-hidden" style="max-height: 0; transition: max-height 0.3s ease-out;">
                 <nav class="flex flex-col space-y-2">
-                    <a href="/" class="py-2 text-gray-600 hover:text-accent border-b">Home</a>
-                    <a href="/" class="py-2 text-gray-600 hover:text-accent border-b">Articles</a>
-                    <a href="#" class="py-2 text-gray-600 hover:text-accent border-b">About</a>
-                    <a href="#" class="py-2 text-gray-600 hover:text-accent">Contact</a>
-                     <!-- Mobile Search -->
+                    <a href="/" class="py-2 text-gray-600 hover:text-primary border-b border-gray-200">Home</a>
+                    <a href="/" class="py-2 text-gray-600 hover:text-primary border-b border-gray-200">Articles</a>
+                    <a href="#" class="py-2 text-gray-600 hover:text-primary border-b border-gray-200">About</a>
+                    <a href="#" class="py-2 text-gray-600 hover:text-primary">Contact</a>
+                    <!-- Mobile Search -->
                     <div class="relative pt-2">
-                        <input type="search" placeholder="Search..." class="w-full px-4 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
-                        <button class="absolute right-3 top-1/2 transform -translate-y-1/2 pt-2 text-gray-400 hover:text-accent">
-                            <i class="fas fa-search"></i>
-                        </button>
+                        <form class="search-form">
+                            <input type="search" placeholder="Search..." class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <button type="submit" class="absolute right-3 top-1/2 transform -translate-y-1/2 pt-2 text-gray-400 hover:text-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
                     </div>
                 </nav>
             </div>
@@ -61,27 +66,27 @@
     </header>
 
     <!-- Main Content Area -->
-    <div class="container mx-auto px-6 py-12">
-        <div class="flex flex-col lg:flex-row gap-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="content-grid">
 
             <!-- Posts Column -->
-            <main class="w-full lg:w-2/3">
+            <main>
                 {{if .Posts}}
                     <!-- Featured Post (first post) -->
                     {{with index .Posts 0}}
-                    <article class="mb-12 card-hover bg-white rounded-lg shadow-lg overflow-hidden">
+                    <article class="mb-12 card-hover bg-white rounded-lg shadow-md overflow-hidden">
                         <a href="/blog/view/{{.ID}}">
-                            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80" alt="Featured Tech Post" class="w-full h-64 object-cover">
+                            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80" alt="Featured Tech Post" class="w-full h-64 sm:h-72 object-cover">
                         </a>
                         <div class="p-6">
                             <div class="mb-2">
                                 {{if .Categories}}
-                                    <a href="#" class="text-xs uppercase font-semibold tracking-wide text-accent hover:underline">{{index .Categories 0}}</a>
+                                    <a href="#" class="category-badge">{{index .Categories 0}}</a>
                                 {{else}}
-                                    <a href="#" class="text-xs uppercase font-semibold tracking-wide text-accent hover:underline">Technology</a>
+                                    <a href="#" class="category-badge">Technology</a>
                                 {{end}}
                             </div>
-                            <h1 class="font-heading text-3xl font-bold mb-3 hover:text-accent transition">
+                            <h1 class="text-2xl sm:text-3xl font-bold mb-3 hover:text-primary transition-colors">
                                 <a href="/blog/view/{{.ID}}">{{.Title}}</a>
                             </h1>
                             <p class="text-gray-600 mb-4">{{.Excerpt}}</p>
@@ -98,24 +103,24 @@
                     {{end}}
 
                     <!-- Recent Posts Grid -->
-                    <h2 class="font-heading text-2xl font-bold mb-6">Recent Articles</h2>
+                    <h2 class="text-2xl font-bold mb-6 text-secondary">Recent Articles</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {{range $index, $post := .Posts}}
                             {{if gt $index 0}}
                                 <!-- Post Card -->
-                                <article class="card-hover bg-white rounded-lg shadow overflow-hidden">
+                                <article class="card-hover bg-white rounded-lg shadow-md overflow-hidden">
                                     <a href="/blog/view/{{$post.ID}}">
                                         <img src="https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=800&q=80" alt="Post Image" class="w-full h-48 object-cover">
                                     </a>
                                     <div class="p-5">
                                         <div class="mb-1">
                                             {{if $post.Categories}}
-                                                <a href="#" class="text-xs uppercase font-semibold tracking-wide text-accent hover:underline">{{index $post.Categories 0}}</a>
+                                                <a href="#" class="category-badge">{{index $post.Categories 0}}</a>
                                             {{else}}
-                                                <a href="#" class="text-xs uppercase font-semibold tracking-wide text-accent hover:underline">Technology</a>
+                                                <a href="#" class="category-badge">Technology</a>
                                             {{end}}
                                         </div>
-                                        <h3 class="font-heading text-lg font-bold mb-2 hover:text-accent transition">
+                                        <h3 class="text-lg font-bold mb-2 hover:text-primary transition-colors">
                                             <a href="/blog/view/{{$post.ID}}">{{$post.Title}}</a>
                                         </h3>
                                         <p class="text-sm text-gray-600 mb-3">{{$post.Excerpt}}</p>
@@ -129,8 +134,8 @@
                     </div>
                 {{else}}
                     <!-- No Posts Message -->
-                    <div class="bg-white rounded-lg shadow-lg p-8 text-center">
-                        <i class="fas fa-newspaper text-5xl text-accent mb-4"></i>
+                    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                        <i class="fas fa-newspaper text-5xl text-primary mb-4"></i>
                         <h2 class="text-2xl font-bold mb-2">No Blog Posts Yet</h2>
                         <p class="text-gray-600 mb-4">We're working on creating amazing content for you. Check back soon for our latest articles!</p>
                     </div>
@@ -140,11 +145,11 @@
                 {{if .Posts}}
                 <div class="mt-12 flex justify-center">
                     <nav class="flex space-x-2" aria-label="Pagination">
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Previous</a>
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">1</a>
-                        <a href="#" aria-current="page" class="relative z-10 inline-flex items-center px-4 py-2 text-sm font-medium text-accent border border-accent bg-blue-50 rounded-md">2</a>
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">3</a>
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Next</a>
+                        <a href="#" class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Previous</a>
+                        <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">1</a>
+                        <a href="#" aria-current="page" class="px-4 py-2 text-sm font-medium text-primary border border-primary bg-primary-light rounded-md">2</a>
+                        <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">3</a>
+                        <a href="#" class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Next</a>
                     </nav>
                 </div>
                 {{end}}
@@ -152,29 +157,29 @@
             </main>
 
             <!-- Sidebar Column -->
-            <aside class="w-full lg:w-1/3">
-                <div class="sticky top-24 space-y-8">
+            <aside class="sidebar">
+                <div class="sidebar-sticky space-y-8">
 
                     <!-- Categories Widget -->
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h3 class="font-heading text-lg font-semibold mb-4 border-b pb-2">Categories</h3>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-semibold mb-4 border-b border-gray-200 pb-2">Categories</h3>
                         <ul class="space-y-1">
-                            <li><a href="#" class="sidebar-link">Software Development (15)</a></li>
-                            <li><a href="#" class="sidebar-link">Cybersecurity (8)</a></li>
-                            <li><a href="#" class="sidebar-link">Cloud Computing (12)</a></li>
-                            <li><a href="#" class="sidebar-link">AI & Machine Learning (5)</a></li>
-                            <li><a href="#" class="sidebar-link">DevOps (7)</a></li>
-                            <li><a href="#" class="sidebar-link">Hardware (3)</a></li>
+                            <li><a href="#" class="widget-link py-2 block text-gray-600">Software Development (15)</a></li>
+                            <li><a href="#" class="widget-link py-2 block text-gray-600">Cybersecurity (8)</a></li>
+                            <li><a href="#" class="widget-link py-2 block text-gray-600">Cloud Computing (12)</a></li>
+                            <li><a href="#" class="widget-link py-2 block text-gray-600">AI & Machine Learning (5)</a></li>
+                            <li><a href="#" class="widget-link py-2 block text-gray-600">DevOps (7)</a></li>
+                            <li><a href="#" class="widget-link py-2 block text-gray-600">Hardware (3)</a></li>
                         </ul>
                     </div>
 
                     <!-- Recent Posts Widget -->
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h3 class="font-heading text-lg font-semibold mb-4 border-b pb-2">Recent Posts</h3>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-semibold mb-4 border-b border-gray-200 pb-2">Recent Posts</h3>
                         <ul class="space-y-3">
                             {{range $index, $post := .Posts}}
                                 {{if lt $index 4}}
-                                    <li><a href="/blog/view/{{$post.ID}}" class="text-sm hover:text-accent">{{$post.Title}}</a></li>
+                                    <li><a href="/blog/view/{{$post.ID}}" class="widget-link text-sm">{{$post.Title}}</a></li>
                                 {{end}}
                             {{else}}
                                 <li class="text-sm text-gray-500">No posts available yet</li>
@@ -183,26 +188,26 @@
                     </div>
 
                      <!-- Tags Widget -->
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h3 class="font-heading text-lg font-semibold mb-4 border-b pb-2">Tags</h3>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-semibold mb-4 border-b border-gray-200 pb-2">Tags</h3>
                         <div class="flex flex-wrap gap-2">
-                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">Docker</a>
-                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">Security</a>
-                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">AWS</a>
-                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">Microservices</a>
-                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">Python</a>
-                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">JavaScript</a>
-                            <a href="#" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded">Serverless</a>
+                            <a href="#" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded">Docker</a>
+                            <a href="#" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded">Security</a>
+                            <a href="#" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded">AWS</a>
+                            <a href="#" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded">Microservices</a>
+                            <a href="#" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded">Python</a>
+                            <a href="#" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded">JavaScript</a>
+                            <a href="#" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded">Serverless</a>
                         </div>
                     </div>
 
                     <!-- Newsletter Widget -->
-                    <div class="bg-accent p-6 rounded-lg shadow text-white">
-                        <h3 class="font-heading text-lg font-semibold mb-3">Stay Updated</h3>
-                        <p class="text-sm mb-4 opacity-90">Get the latest tech news and tutorials straight to your inbox.</p>
-                        <form>
+                    <div class="newsletter-widget p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-semibold mb-3 text-white">Stay Updated</h3>
+                        <p class="text-sm mb-4 text-white opacity-90">Get the latest tech news and tutorials straight to your inbox.</p>
+                        <form class="newsletter-form">
                             <input type="email" placeholder="your.email@example.com" class="w-full px-4 py-2 rounded border border-transparent text-gray-800 focus:outline-none focus:ring-2 focus:ring-white mb-3">
-                            <button type="submit" class="w-full px-4 py-2 bg-white text-accent font-semibold rounded hover:bg-gray-100 transition">Subscribe</button>
+                            <button type="submit" class="w-full px-4 py-2 bg-white text-primary font-semibold rounded hover:bg-gray-100 transition">Subscribe</button>
                         </form>
                     </div>
 
@@ -213,52 +218,43 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-gray-300 mt-16">
-        <div class="container mx-auto px-6 py-8">
+    <footer class="bg-gray-900 text-gray-300 mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div class="flex flex-col items-center">
+
                 <!-- Social Media Icons - Centered -->
-                <div class="flex justify-center space-x-6 mb-6">
-                    <a href="#" class="text-gray-400 hover:text-white transition text-2xl">
+                <div class="flex justify-center space-x-6 mb-8">
+                    <a href="#" class="social-link text-2xl">
                         <i class="fab fa-twitter"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-white transition text-2xl">
+                    <a href="#" class="social-link text-2xl">
                         <i class="fab fa-github"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-white transition text-2xl">
+                    <a href="#" class="social-link text-2xl">
                         <i class="fab fa-linkedin-in"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-white transition text-2xl">
+                    <a href="#" class="social-link text-2xl">
                         <i class="fab fa-youtube"></i>
                     </a>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-8">
+                    <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition">Terms of Service</a>
                 </div>
 
                 <!-- Copyright and Links - Below Social Icons -->
                 <div class="text-center">
                     <p>&copy; 2025 TechInsights Blog. All rights reserved.</p>
-                    <div class="text-sm mt-3">
-                        <a href="#" class="hover:text-white transition">About</a> |
-                        <a href="#" class="hover:text-white transition">Contact</a> |
-                        <a href="#" class="hover:text-white transition">Privacy Policy</a> |
-                        <a href="#" class="hover:text-white transition">Terms of Service</a>
-                    </div>
                 </div>
             </div>
         </div>
     </footer>
 
-    <script>
-        // Mobile menu toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.getElementById('menu-toggle');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            if (menuToggle) {
-                menuToggle.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                });
-            }
-        });
-    </script>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="/static/js/main.js"></script>
 
 </body>
 </html>

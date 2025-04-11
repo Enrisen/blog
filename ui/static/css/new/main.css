@@ -1,0 +1,59 @@
+/* Main CSS file that imports all necessary stylesheets */
+@import 'base.css';
+@import 'layout.css';
+@import 'components.css';
+
+/* Responsive design rules */
+@media (min-width: 768px) {
+  .content-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  .sidebar {
+    margin-top: 0;
+  }
+
+  .newsletter-form {
+    flex-direction: row;
+  }
+
+  .newsletter-input {
+    flex: 1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .header-container {
+    height: 5rem;
+  }
+
+  .logo {
+    font-size: 1.75rem;
+  }
+
+  .blog-content h2 {
+    font-size: 2rem;
+  }
+
+  .blog-content h3 {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .post-card-image {
+    height: 180px;
+  }
+
+  .post-card-title {
+    font-size: 1.125rem;
+  }
+
+  .blog-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .blog-content h3 {
+    font-size: 1.25rem;
+  }
+}
