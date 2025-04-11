@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"strings"
 	"time"
+
+	"github.com/Enrisen/blog/internal/validator"
 )
 
 type Post struct {
@@ -188,4 +190,211 @@ func (m *BlogModel) getPostCategories(postID int64) ([]string, error) {
 	}
 
 	return categories, nil
+}
+
+// Get retrieves a single blog post by ID
+func (m *BlogModel) Get(id int64) (*Post, error) {
+	query := `
+		SELECT p.post_id, p.author_id, p.title, p.content, p.excerpt, p.view_count, p.created_at
+		FROM posts p
+		WHERE p.post_id = $1`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var post Post
+
+	err := m.DB.QueryRowContext(ctx, query, id).Scan(
+		&post.ID,
+		&post.AuthorID,
+		&post.Title,
+		&post.Content,
+		&post.Excerpt,
+		&post.ViewCount,
+		&post.CreatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, sql.ErrNoRows
+		}
+		return nil, err
+	}
+
+	// Get categories for this post
+	post.Categories, err = m.getPostCategories(post.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Increment view count
+	_, err = m.DB.ExecContext(ctx,
+		`UPDATE posts SET view_count = view_count + 1 WHERE post_id = $1`,
+		id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &post, nil
+}
+
+// UpdatePost updates an existing blog post in the database
+func (m *BlogModel) UpdatePost(id int64, title, content string, categories []string) error {
+	// Create an excerpt from the content (first 150 characters)
+	excerpt := content
+	if len(content) > 150 {
+		excerpt = strings.TrimSpace(content[:150]) + "..."
+	}
+
+	// Start a transaction
+	tx, err := m.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	// Update the post
+	query := `
+		UPDATE posts
+		SET title = $1, content = $2, excerpt = $3
+		WHERE post_id = $4`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	_, err = tx.ExecContext(
+		ctx,
+		query,
+		title,
+		content,
+		excerpt,
+		id,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	// Delete existing category associations
+	_, err = tx.ExecContext(
+		ctx,
+		`DELETE FROM post_categories WHERE post_id = $1`,
+		id,
+	)
+	if err != nil {
+		return err
+	}
+
+	// If categories are provided, add them
+	if len(categories) > 0 {
+		for _, category := range categories {
+			// First check if the category exists
+			var categoryID int64
+			err = tx.QueryRowContext(
+				ctx,
+				`SELECT category_id FROM categories WHERE name = $1`,
+				category,
+			).Scan(&categoryID)
+
+			if err == sql.ErrNoRows {
+				// Category doesn't exist, create it
+				err = tx.QueryRowContext(
+					ctx,
+					`INSERT INTO categories (name) VALUES ($1) RETURNING category_id`,
+					category,
+				).Scan(&categoryID)
+				if err != nil {
+					return err
+				}
+			} else if err != nil {
+				return err
+			}
+
+			// Link the post to the category
+			_, err = tx.ExecContext(
+				ctx,
+				`INSERT INTO post_categories (post_id, category_id) VALUES ($1, $2)`,
+				id,
+				categoryID,
+			)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// Commit the transaction
+	if err = tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DeletePost deletes a blog post and its category associations
+func (m *BlogModel) DeletePost(id int64) error {
+	// Start a transaction
+	tx, err := m.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	// Delete category associations first (due to foreign key constraints)
+	_, err = tx.ExecContext(
+		ctx,
+		`DELETE FROM post_categories WHERE post_id = $1`,
+		id,
+	)
+	if err != nil {
+		return err
+	}
+
+	// Delete the post
+	_, err = tx.ExecContext(
+		ctx,
+		`DELETE FROM posts WHERE post_id = $1`,
+		id,
+	)
+	if err != nil {
+		return err
+	}
+
+	// Commit the transaction
+	if err = tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ValidateBlogPost validates the blog post form data
+func ValidateBlogPost(v *validator.Validator, title, content string, categories []string) {
+	// Validate title
+	v.Check(validator.NotBlank(title), "title", "Title cannot be empty")
+	v.Check(validator.MaxLength(title, 100), "title", "Title cannot be more than 100 characters")
+
+	// Validate content
+	v.Check(validator.NotBlank(content), "content", "Content cannot be empty")
+
+	// Validate categories
+	if len(categories) > 0 {
+		for i, category := range categories {
+			if !validator.NotBlank(category) {
+				v.AddError(
+					"category_"+string(rune('a'+i)),
+					"Category cannot be empty",
+				)
+			}
+			if !validator.MaxLength(category, 50) {
+				v.AddError(
+					"category_"+string(rune('a'+i)),
+					"Category cannot be more than 50 characters",
+				)
+			}
+		}
+	}
 }

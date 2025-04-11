@@ -6,6 +6,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/Enrisen/blog/internal/validator"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -67,4 +68,24 @@ func (m *UserModel) Insert(name, email, password string) error {
 	}
 
 	return nil
+}
+
+// ValidateUserRegistration validates the user registration form data
+func ValidateUserRegistration(v *validator.Validator, name, email, password, confirmPassword string) {
+	// Validate name
+	v.Check(validator.NotBlank(name), "name", "Name cannot be empty")
+	v.Check(validator.MaxLength(name, 100), "name", "Name cannot be more than 100 characters")
+
+	// Validate email
+	v.Check(validator.NotBlank(email), "email", "Email cannot be empty")
+	v.Check(validator.IsValidEmail(email), "email", "Please enter a valid email address")
+	v.Check(validator.MaxLength(email, 255), "email", "Email cannot be more than 255 characters")
+
+	// Validate password
+	v.Check(validator.NotBlank(password), "password", "Password cannot be empty")
+	v.Check(validator.MinLength(password, 8), "password", "Password must be at least 8 characters")
+
+	// Validate password confirmation
+	v.Check(validator.NotBlank(confirmPassword), "confirm_password", "Please confirm your password")
+	v.Check(password == confirmPassword, "confirm_password", "Passwords do not match")
 }

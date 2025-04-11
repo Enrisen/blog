@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechSphere | Information Technology Blog</title>
+    <title>{{.Title}}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -16,7 +16,7 @@
         <div class="container mx-auto px-6 py-4">
             <div class="flex justify-between items-center">
                 <!-- Logo -->
-                <a href="#" class="text-2xl font-heading font-bold tracking-tight">
+                <a href="/" class="text-2xl font-heading font-bold tracking-tight">
                     <span class="text-accent">Tech</span>Sphere
                 </a>
 
@@ -64,91 +64,89 @@
     <div class="container mx-auto px-6 py-12">
         <div class="flex flex-col lg:flex-row gap-12">
 
-            <!-- Posts Column -->
+            <!-- Post Content Column -->
             <main class="w-full lg:w-2/3">
-                {{if .Posts}}
-                    <!-- Featured Post (first post) -->
-                    {{with index .Posts 0}}
-                    <article class="mb-12 card-hover bg-white rounded-lg shadow-lg overflow-hidden">
-                        <a href="/blog/view/{{.ID}}">
-                            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80" alt="Featured Tech Post" class="w-full h-64 object-cover">
-                        </a>
-                        <div class="p-6">
-                            <div class="mb-2">
-                                {{if .Categories}}
-                                    <a href="#" class="text-xs uppercase font-semibold tracking-wide text-accent hover:underline">{{index .Categories 0}}</a>
-                                {{else}}
-                                    <a href="#" class="text-xs uppercase font-semibold tracking-wide text-accent hover:underline">Technology</a>
-                                {{end}}
-                            </div>
-                            <h1 class="font-heading text-3xl font-bold mb-3 hover:text-accent transition">
-                                <a href="/blog/view/{{.ID}}">{{.Title}}</a>
-                            </h1>
-                            <p class="text-gray-600 mb-4">{{.Excerpt}}</p>
-                            <div class="flex items-center text-sm text-gray-500">
-                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Author" class="w-8 h-8 rounded-full mr-2 object-cover">
-                                <span>By Admin</span>
-                                <span class="mx-2">•</span>
-                                <span>{{.CreatedAt.Format "January 2, 2006"}}</span>
-                                <span class="mx-2">•</span>
-                                <span>{{.ViewCount}} views</span>
-                            </div>
-                        </div>
-                    </article>
-                    {{end}}
+                {{with .Post}}
+                <article class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80" alt="Featured Tech Post" class="w-full h-64 object-cover">
 
-                    <!-- Recent Posts Grid -->
-                    <h2 class="font-heading text-2xl font-bold mb-6">Recent Articles</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {{range $index, $post := .Posts}}
-                            {{if gt $index 0}}
-                                <!-- Post Card -->
-                                <article class="card-hover bg-white rounded-lg shadow overflow-hidden">
-                                    <a href="/blog/view/{{$post.ID}}">
-                                        <img src="https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=800&q=80" alt="Post Image" class="w-full h-48 object-cover">
-                                    </a>
-                                    <div class="p-5">
-                                        <div class="mb-1">
-                                            {{if $post.Categories}}
-                                                <a href="#" class="text-xs uppercase font-semibold tracking-wide text-accent hover:underline">{{index $post.Categories 0}}</a>
-                                            {{else}}
-                                                <a href="#" class="text-xs uppercase font-semibold tracking-wide text-accent hover:underline">Technology</a>
-                                            {{end}}
-                                        </div>
-                                        <h3 class="font-heading text-lg font-bold mb-2 hover:text-accent transition">
-                                            <a href="/blog/view/{{$post.ID}}">{{$post.Title}}</a>
-                                        </h3>
-                                        <p class="text-sm text-gray-600 mb-3">{{$post.Excerpt}}</p>
-                                        <div class="text-xs text-gray-500">
-                                            <span>{{$post.CreatedAt.Format "January 2, 2006"}}</span> <span class="mx-1">•</span> <span>{{$post.ViewCount}} views</span>
-                                        </div>
-                                    </div>
-                                </article>
+                    <div class="p-8">
+                        <div class="mb-3 flex flex-wrap gap-2">
+                            {{range .Categories}}
+                                <a href="#" class="text-xs uppercase font-semibold tracking-wide text-accent bg-blue-50 px-2 py-1 rounded hover:bg-blue-100">{{.}}</a>
+                            {{else}}
+                                <a href="#" class="text-xs uppercase font-semibold tracking-wide text-accent bg-blue-50 px-2 py-1 rounded hover:bg-blue-100">Technology</a>
                             {{end}}
+                        </div>
+
+                        <h1 class="font-heading text-3xl font-bold mb-4">{{.Title}}</h1>
+
+                        <div class="flex items-center text-sm text-gray-500 mb-6">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Author" class="w-8 h-8 rounded-full mr-2 object-cover">
+                            <span>By Admin</span>
+                            <span class="mx-2">•</span>
+                            <span>{{.CreatedAt.Format "January 2, 2006"}}</span>
+                            <span class="mx-2">•</span>
+                            <span>{{.ViewCount}} views</span>
+                        </div>
+<!-- Edit and Delete Buttons -->
+<div class="flex space-x-4 mb-6">
+    <a href="/blog/edit/{{.ID}}" class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+        <i class="fas fa-edit mr-2"></i> Edit Post
+    </a>
+    <form action="/blog/delete/{{.ID}}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this post?');">
+        <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
+            <i class="fas fa-trash-alt mr-2"></i> Delete Post
+        </button>
+    </form>
+</div>
+
+<div class="prose max-w-none">
+    <p>{{.Content}}</p>
+</div>
+                        </div>
+                    </div>
+                </article>
+                {{end}}
+
+                <!-- Back to Blog Button -->
+                <div class="mt-8">
+                    <a href="/" class="inline-flex items-center px-4 py-2 bg-accent text-white rounded hover:bg-accent-dark transition">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Blog
+                    </a>
+                </div>
+
+                <!-- Related Posts (Optional) -->
+                {{if .RelatedPosts}}
+                <div class="mt-12">
+                    <h2 class="font-heading text-2xl font-bold mb-6">Related Articles</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {{range .RelatedPosts}}
+                            <article class="card-hover bg-white rounded-lg shadow overflow-hidden">
+                                <a href="/blog/view/{{.ID}}">
+                                    <img src="https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=800&q=80" alt="Post Image" class="w-full h-48 object-cover">
+                                </a>
+                                <div class="p-5">
+                                    <div class="mb-1">
+                                        {{if .Categories}}
+                                            <a href="#" class="text-xs uppercase font-semibold tracking-wide text-accent hover:underline">{{index .Categories 0}}</a>
+                                        {{else}}
+                                            <a href="#" class="text-xs uppercase font-semibold tracking-wide text-accent hover:underline">Technology</a>
+                                        {{end}}
+                                    </div>
+                                    <h3 class="font-heading text-lg font-bold mb-2 hover:text-accent transition">
+                                        <a href="/blog/view/{{.ID}}">{{.Title}}</a>
+                                    </h3>
+                                    <p class="text-sm text-gray-600 mb-3">{{.Excerpt}}</p>
+                                    <div class="text-xs text-gray-500">
+                                        <span>{{.CreatedAt.Format "January 2, 2006"}}</span> <span class="mx-1">•</span> <span>{{.ViewCount}} views</span>
+                                    </div>
+                                </div>
+                            </article>
                         {{end}}
                     </div>
-                {{else}}
-                    <!-- No Posts Message -->
-                    <div class="bg-white rounded-lg shadow-lg p-8 text-center">
-                        <i class="fas fa-newspaper text-5xl text-accent mb-4"></i>
-                        <h2 class="text-2xl font-bold mb-2">No Blog Posts Yet</h2>
-                        <p class="text-gray-600 mb-4">We're working on creating amazing content for you. Check back soon for our latest articles!</p>
-                    </div>
-                {{end}}
-
-                <!-- Pagination (Optional) -->
-                {{if .Posts}}
-                <div class="mt-12 flex justify-center">
-                    <nav class="flex space-x-2" aria-label="Pagination">
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Previous</a>
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">1</a>
-                        <a href="#" aria-current="page" class="relative z-10 inline-flex items-center px-4 py-2 text-sm font-medium text-accent border border-accent bg-blue-50 rounded-md">2</a>
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">3</a>
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Next</a>
-                    </nav>
                 </div>
                 {{end}}
-
             </main>
 
             <!-- Sidebar Column -->
@@ -172,7 +170,7 @@
                     <div class="bg-white p-6 rounded-lg shadow">
                         <h3 class="font-heading text-lg font-semibold mb-4 border-b pb-2">Recent Posts</h3>
                         <ul class="space-y-3">
-                            {{range $index, $post := .Posts}}
+                            {{range $index, $post := .RecentPosts}}
                                 {{if lt $index 4}}
                                     <li><a href="/blog/view/{{$post.ID}}" class="text-sm hover:text-accent">{{$post.Title}}</a></li>
                                 {{end}}

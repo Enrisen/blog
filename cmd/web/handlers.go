@@ -1,9 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"net/http"
+	"strconv"
 	"strings"
 
+	appdata "github.com/Enrisen/blog/internal/data"
 	"github.com/Enrisen/blog/internal/validator"
 )
 
@@ -81,7 +84,7 @@ func (app *application) blogCreateSubmit(w http.ResponseWriter, r *http.Request)
 
 	// Validate form inputs using the validator
 	v := validator.NewValidator()
-	v.ValidateBlogPost(title, content, categories)
+	appdata.ValidateBlogPost(v, title, content, categories)
 
 	// If there are validation errors, re-render the form
 	if !v.ValidData() {
@@ -148,7 +151,7 @@ func (app *application) userRegisterSubmit(w http.ResponseWriter, r *http.Reques
 
 	// Validate form inputs using the validator
 	v := validator.NewValidator()
-	v.ValidateUserRegistration(name, email, password, confirmPassword)
+	appdata.ValidateUserRegistration(v, name, email, password, confirmPassword)
 
 	// If there are validation errors, re-render the form
 	if !v.ValidData() {
@@ -193,4 +196,187 @@ func (app *application) userRegisterSubmit(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+}
+
+// blogView displays a single blog post
+func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
+	// Extract the post ID from the URL
+	idStr := r.PathValue("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Get the post from the database
+	post, err := app.blog.Get(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.NotFound(w, r)
+		} else {
+			app.logger.Error("failed to get blog post", "error", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Get recent posts for the sidebar
+	recentPosts, err := app.blog.GetAll()
+	if err != nil {
+		app.logger.Error("failed to get recent posts", "error", err)
+		// Continue with the page even if we can't get recent posts
+	}
+
+	// Prepare template data
+	data := NewTemplateData()
+	data.Title = post.Title + " | TechSphere"
+	data.HeaderText = post.Title
+	data.Post = post
+	data.RecentPosts = recentPosts
+
+	// Render the template
+	err = app.render(w, http.StatusOK, "blog_view.tmpl", data)
+	if err != nil {
+		app.logger.Error("failed to render blog view page", "error", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+}
+
+// blogEditForm displays the blog post edit form
+func (app *application) blogEditForm(w http.ResponseWriter, r *http.Request) {
+	// Extract the post ID from the URL
+	idStr := r.PathValue("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Get the post from the database
+	post, err := app.blog.Get(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.NotFound(w, r)
+		} else {
+			app.logger.Error("failed to get blog post", "error", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Prepare template data
+	data := NewTemplateData()
+	data.Title = "Edit Post | TechSphere"
+	data.HeaderText = "Edit Blog Post"
+	data.Post = post
+
+	// Pre-populate form data
+	categoriesStr := strings.Join(post.Categories, ", ")
+	data.FormData = map[string]string{
+		"title":      post.Title,
+		"content":    post.Content,
+		"categories": categoriesStr,
+	}
+
+	// Render the template
+	err = app.render(w, http.StatusOK, "blog_edit.tmpl", data)
+	if err != nil {
+		app.logger.Error("failed to render blog edit page", "error", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+}
+
+// blogEditSubmit processes the blog post edit form submission
+func (app *application) blogEditSubmit(w http.ResponseWriter, r *http.Request) {
+	// Extract the post ID from the URL
+	idStr := r.PathValue("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Parse the form data
+	err = r.ParseForm()
+	if err != nil {
+		app.logger.Error("failed to parse blog edit form", "error", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	// Extract form values
+	title := r.PostForm.Get("title")
+	content := r.PostForm.Get("content")
+	categoriesStr := r.PostForm.Get("categories")
+
+	// Process categories (split by comma and trim spaces)
+	var categories []string
+	if categoriesStr != "" {
+		for _, category := range strings.Split(categoriesStr, ",") {
+			trimmedCategory := strings.TrimSpace(category)
+			if trimmedCategory != "" {
+				categories = append(categories, trimmedCategory)
+			}
+		}
+	}
+
+	// Initialize form data and errors
+	data := NewTemplateData()
+	data.Title = "Edit Post | TechSphere"
+	data.HeaderText = "Edit Blog Post"
+	data.FormData = map[string]string{
+		"title":      title,
+		"content":    content,
+		"categories": categoriesStr,
+	}
+
+	// Validate form inputs using the validator
+	v := validator.NewValidator()
+	appdata.ValidateBlogPost(v, title, content, categories)
+
+	// If there are validation errors, re-render the form
+	if !v.ValidData() {
+		data.FormErrors = v.Errors
+		err = app.render(w, http.StatusUnprocessableEntity, "blog_edit.tmpl", data)
+		if err != nil {
+			app.logger.Error("failed to render blog edit page with errors", "error", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Update the blog post
+	err = app.blog.UpdatePost(id, title, content, categories)
+	if err != nil {
+		app.logger.Error("failed to update blog post", "error", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Redirect to the updated blog post
+	http.Redirect(w, r, "/blog/view/"+idStr, http.StatusSeeOther)
+}
+
+// blogDelete handles the deletion of a blog post
+func (app *application) blogDelete(w http.ResponseWriter, r *http.Request) {
+	// Extract the post ID from the URL
+	idStr := r.PathValue("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Delete the post
+	err = app.blog.DeletePost(id)
+	if err != nil {
+		app.logger.Error("failed to delete blog post", "error", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Redirect to the blog page
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
