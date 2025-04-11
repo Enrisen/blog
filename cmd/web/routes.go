@@ -10,6 +10,10 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 	mux.HandleFunc("GET /{$}", app.blogPage)
 
+	// Blog post routes
+	mux.HandleFunc("GET /blog/create", app.blogCreateForm)
+	mux.HandleFunc("POST /blog/create", app.blogCreateSubmit)
+
 	// User registration routes
 	mux.HandleFunc("GET /user/register", app.userRegisterForm)
 	mux.HandleFunc("POST /user/register", app.userRegisterSubmit)

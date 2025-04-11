@@ -74,3 +74,31 @@ func (v *Validator) ValidateUserRegistration(name, email, password, confirmPassw
 	v.Check(NotBlank(confirmPassword), "confirm_password", "Please confirm your password")
 	v.Check(password == confirmPassword, "confirm_password", "Passwords do not match")
 }
+
+// ValidateBlogPost validates the blog post form data
+func (v *Validator) ValidateBlogPost(title, content string, categories []string) {
+	// Validate title
+	v.Check(NotBlank(title), "title", "Title cannot be empty")
+	v.Check(MaxLength(title, 100), "title", "Title cannot be more than 100 characters")
+
+	// Validate content
+	v.Check(NotBlank(content), "content", "Content cannot be empty")
+
+	// Validate categories (optional validation)
+	if len(categories) > 0 {
+		for i, category := range categories {
+			if !NotBlank(category) {
+				v.AddError(
+					"category_"+string(rune('a'+i)),
+					"Category cannot be empty",
+				)
+			}
+			if !MaxLength(category, 50) {
+				v.AddError(
+					"category_"+string(rune('a'+i)),
+					"Category cannot be more than 50 characters",
+				)
+			}
+		}
+	}
+}
