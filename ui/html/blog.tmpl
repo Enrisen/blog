@@ -164,12 +164,11 @@
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h3 class="text-lg font-semibold mb-4 border-b border-gray-200 pb-2">Categories</h3>
                         <ul class="space-y-1">
-                            <li><a href="#" class="widget-link py-2 block text-gray-600">Software Development (15)</a></li>
-                            <li><a href="#" class="widget-link py-2 block text-gray-600">Cybersecurity (8)</a></li>
-                            <li><a href="#" class="widget-link py-2 block text-gray-600">Cloud Computing (12)</a></li>
-                            <li><a href="#" class="widget-link py-2 block text-gray-600">AI & Machine Learning (5)</a></li>
-                            <li><a href="#" class="widget-link py-2 block text-gray-600">DevOps (7)</a></li>
-                            <li><a href="#" class="widget-link py-2 block text-gray-600">Hardware (3)</a></li>
+                        	{{range .Categories}}
+                        		<li><a href="#" class="widget-link py-2 block text-gray-600">{{.Name}}</a></li> <!-- TODO: Add category links later -->
+                        	{{else}}
+                        		<li class="text-sm text-gray-500">No categories found.</li>
+                        	{{end}}
                         </ul>
                     </div>
 

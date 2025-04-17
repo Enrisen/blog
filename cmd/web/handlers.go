@@ -19,9 +19,17 @@ func (app *application) blogPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Fetch all categories for the sidebar
+	categories, err := app.blog.GetAllCategories()
+	if err != nil {
+		app.logger.Error("failed to get categories", "error", err)
+		// Don't fail the whole page, just log the error
+	}
+
 	data := NewTemplateData()
 	data.Title = "TechSphere | Information Technology Blog"
 	data.HeaderText = "Latest Technology Articles"
+	data.Categories = categories // Add categories to template data
 	data.Posts = posts
 
 	err = app.render(w, http.StatusOK, "blog.tmpl", data)
@@ -34,11 +42,20 @@ func (app *application) blogPage(w http.ResponseWriter, r *http.Request) {
 
 // blogCreateForm displays the blog post creation form
 func (app *application) blogCreateForm(w http.ResponseWriter, r *http.Request) {
+	// Fetch all categories for the dropdown
+	categories, err := app.blog.GetAllCategories()
+	if err != nil {
+		app.logger.Error("failed to get categories for create form", "error", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
 	data := NewTemplateData()
 	data.Title = "Create Post | TechSphere"
 	data.HeaderText = "Create a New Blog Post"
+	data.Categories = categories // Add categories to template data
 
-	err := app.render(w, http.StatusOK, "blog_create.tmpl", data)
+	err = app.render(w, http.StatusOK, "blog_create.tmpl", data) // Use = instead of :=
 	if err != nil {
 		app.logger.Error("failed to render blog creation page", "template", "blog_create.tmpl", "error", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -59,35 +76,55 @@ func (app *application) blogCreateSubmit(w http.ResponseWriter, r *http.Request)
 	// Extract form values
 	title := r.PostForm.Get("title")
 	content := r.PostForm.Get("content")
-	categoriesStr := r.PostForm.Get("categories")
+	selectedCategory := r.PostForm.Get("category")
+	newCategory := strings.TrimSpace(r.PostForm.Get("new_category"))
 
-	// Process categories (split by comma and trim spaces)
-	var categories []string
-	if categoriesStr != "" {
-		for _, category := range strings.Split(categoriesStr, ",") {
-			trimmedCategory := strings.TrimSpace(category)
-			if trimmedCategory != "" {
-				categories = append(categories, trimmedCategory)
-			}
-		}
+	// Determine which category to save
+	categoriesToSave := []string{}
+
+	if selectedCategory == "new" && newCategory != "" {
+		// User selected "Add new category" and provided a name
+		categoriesToSave = append(categoriesToSave, newCategory)
+	} else if selectedCategory != "" && selectedCategory != "new" {
+		// User selected an existing category
+		categoriesToSave = append(categoriesToSave, selectedCategory)
 	}
+	// If neither condition is met, no category will be saved
 
 	// Initialize form data and errors
 	data := NewTemplateData()
 	data.Title = "Create Post | TechSphere"
 	data.HeaderText = "Create a New Blog Post"
 	data.FormData = map[string]string{
-		"title":      title,
-		"content":    content,
-		"categories": categoriesStr,
+		"title":        title,
+		"content":      content,
+		"new_category": newCategory,
+		// We might need a way to pass selectedCategories back if needed for re-population
 	}
+	// TODO: Add selectedCategories back to FormData if needed for re-populating multi-select
 
 	// Validate form inputs using the validator
 	v := validator.NewValidator()
-	appdata.ValidateBlogPost(v, title, content, categories)
+	// Pass the combined list for validation
+	appdata.ValidateBlogPost(v, title, content, categoriesToSave)
+	// TODO: Add specific validation for newCategory if desired (e.g., length)
 
 	// If there are validation errors, re-render the form
 	if !v.ValidData() {
+		// Fetch categories again to populate the form dropdown on error
+		categoriesForForm, catErr := app.blog.GetAllCategories()
+		if catErr != nil {
+			app.logger.Error("failed to get categories for create form re-render", "error", catErr)
+			// If we can't get categories, render the form without them, but log the error
+		}
+
+		// Create a map of selected categories for the template
+		data.SelectedCategories = make(map[string]bool)
+		if selectedCategory != "" && selectedCategory != "new" {
+			data.SelectedCategories[selectedCategory] = true
+		}
+
+		data.Categories = categoriesForForm
 		data.FormErrors = v.Errors
 		err = app.render(w, http.StatusUnprocessableEntity, "blog_create.tmpl", data)
 		if err != nil {
@@ -101,7 +138,7 @@ func (app *application) blogCreateSubmit(w http.ResponseWriter, r *http.Request)
 	var authorID int64 = 1
 
 	// Create the blog post
-	_, err = app.blog.CreatePost(authorID, title, content, categories)
+	_, err = app.blog.CreatePost(authorID, title, content, categoriesToSave) // Pass combined list
 	if err != nil {
 		app.logger.Error("failed to create blog post", "error", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -227,10 +264,18 @@ func (app *application) blogView(w http.ResponseWriter, r *http.Request) {
 		// Continue with the page even if we can't get recent posts
 	}
 
+	// Fetch all categories for the sidebar
+	categories, err := app.blog.GetAllCategories()
+	if err != nil {
+		app.logger.Error("failed to get categories for view page", "error", err)
+		// Don't fail the whole page, just log the error
+	}
+
 	// Prepare template data
 	data := NewTemplateData()
 	data.Title = post.Title + " | TechSphere"
 	data.HeaderText = post.Title
+	data.Categories = categories // Add categories to template data
 	data.Post = post
 	data.RecentPosts = recentPosts
 
@@ -265,18 +310,34 @@ func (app *application) blogEditForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Fetch all categories for the dropdown
+	allCategories, err := app.blog.GetAllCategories()
+	if err != nil {
+		app.logger.Error("failed to get categories for edit form", "error", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
 	// Prepare template data
 	data := NewTemplateData()
 	data.Title = "Edit Post | TechSphere"
 	data.HeaderText = "Edit Blog Post"
+	data.Categories = allCategories // Add all categories for the dropdown
 	data.Post = post
 
+	// Create a map of the post's current categories for easy lookup in the template
+	data.SelectedCategories = make(map[string]bool)
+
+	// For the dropdown, we'll just select the first category if there is one
+	if len(post.Categories) > 0 {
+		data.SelectedCategories[post.Categories[0]] = true
+	}
+
 	// Pre-populate form data
-	categoriesStr := strings.Join(post.Categories, ", ")
 	data.FormData = map[string]string{
-		"title":      post.Title,
-		"content":    post.Content,
-		"categories": categoriesStr,
+		"title":        post.Title,
+		"content":      post.Content,
+		"new_category": "", // Initialize empty for the new category field
 	}
 
 	// Render the template
@@ -309,35 +370,54 @@ func (app *application) blogEditSubmit(w http.ResponseWriter, r *http.Request) {
 	// Extract form values
 	title := r.PostForm.Get("title")
 	content := r.PostForm.Get("content")
-	categoriesStr := r.PostForm.Get("categories")
+	selectedCategory := r.PostForm.Get("category")
+	newCategory := strings.TrimSpace(r.PostForm.Get("new_category"))
 
-	// Process categories (split by comma and trim spaces)
-	var categories []string
-	if categoriesStr != "" {
-		for _, category := range strings.Split(categoriesStr, ",") {
-			trimmedCategory := strings.TrimSpace(category)
-			if trimmedCategory != "" {
-				categories = append(categories, trimmedCategory)
-			}
-		}
+	// Determine which category to save
+	categoriesToSave := []string{}
+
+	if selectedCategory == "new" && newCategory != "" {
+		// User selected "Add new category" and provided a name
+		categoriesToSave = append(categoriesToSave, newCategory)
+	} else if selectedCategory != "" && selectedCategory != "new" {
+		// User selected an existing category
+		categoriesToSave = append(categoriesToSave, selectedCategory)
 	}
+	// If neither condition is met, no category will be saved
 
 	// Initialize form data and errors
 	data := NewTemplateData()
 	data.Title = "Edit Post | TechSphere"
 	data.HeaderText = "Edit Blog Post"
 	data.FormData = map[string]string{
-		"title":      title,
-		"content":    content,
-		"categories": categoriesStr,
+		"title":        title,
+		"content":      content,
+		"new_category": newCategory,
+		// TODO: Add selectedCategories back to FormData if needed for re-populating multi-select
 	}
 
 	// Validate form inputs using the validator
 	v := validator.NewValidator()
-	appdata.ValidateBlogPost(v, title, content, categories)
+	appdata.ValidateBlogPost(v, title, content, categoriesToSave) // Pass combined list
+	// TODO: Add specific validation for newCategory if desired
 
 	// If there are validation errors, re-render the form
 	if !v.ValidData() {
+		// Fetch categories again to populate the form dropdown on error
+		categoriesForForm, catErr := app.blog.GetAllCategories()
+		if catErr != nil {
+			app.logger.Error("failed to get categories for edit form re-render", "error", catErr)
+			// If we can't get categories, render the form without them, but log the error
+		}
+		// Need to pass the post data again as well
+		data.Post = &appdata.Post{ID: id} // Pass a minimal post struct just for ID if needed, or fetch again if more data required by template
+		data.Categories = categoriesForForm
+		// Create a map of selected categories for the template
+		data.SelectedCategories = make(map[string]bool)
+		if selectedCategory != "" && selectedCategory != "new" {
+			data.SelectedCategories[selectedCategory] = true
+		}
+
 		data.FormErrors = v.Errors
 		err = app.render(w, http.StatusUnprocessableEntity, "blog_edit.tmpl", data)
 		if err != nil {
@@ -348,7 +428,7 @@ func (app *application) blogEditSubmit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update the blog post
-	err = app.blog.UpdatePost(id, title, content, categories)
+	err = app.blog.UpdatePost(id, title, content, categoriesToSave) // Pass combined list
 	if err != nil {
 		app.logger.Error("failed to update blog post", "error", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

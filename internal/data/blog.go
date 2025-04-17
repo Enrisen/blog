@@ -17,7 +17,13 @@ type Post struct {
 	Excerpt    string    `json:"excerpt"`
 	ViewCount  int       `json:"view_count"`
 	CreatedAt  time.Time `json:"created_at"`
-	Categories []string  `json:"categories"`
+	Categories []string  `json:"categories"` // Keep this for individual post display if needed
+}
+
+// Category represents a single category in the database.
+type Category struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type BlogModel struct {
@@ -371,6 +377,43 @@ func (m *BlogModel) DeletePost(id int64) error {
 	return nil
 }
 
+// GetAllCategories retrieves all categories from the database.
+func (m *BlogModel) GetAllCategories() ([]*Category, error) {
+	query := `
+		SELECT category_id, name
+		FROM categories
+		ORDER BY name ASC`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	categories := []*Category{}
+
+	for rows.Next() {
+		var category Category
+		err := rows.Scan(
+			&category.ID,
+			&category.Name,
+		)
+		if err != nil {
+			return nil, err
+		}
+		categories = append(categories, &category)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return categories, nil
+}
+
 // ValidateBlogPost validates the blog post form data
 func ValidateBlogPost(v *validator.Validator, title, content string, categories []string) {
 	// Validate title
@@ -380,8 +423,10 @@ func ValidateBlogPost(v *validator.Validator, title, content string, categories 
 	// Validate content
 	v.Check(validator.NotBlank(content), "content", "Content cannot be empty")
 
-	// Validate categories
-	if len(categories) > 0 {
+	// Validate categories - require at least one category
+	if len(categories) == 0 {
+		v.AddError("category", "Please select or add a category")
+	} else {
 		for i, category := range categories {
 			if !validator.NotBlank(category) {
 				v.AddError(
