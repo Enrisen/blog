@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Enrisen/blog/internal/data"
+	"github.com/golangcollege/sessions"
 	_ "github.com/lib/pq"
 )
 
@@ -19,6 +20,7 @@ type application struct {
 	blog          *data.BlogModel
 	users         *data.UserModel
 	templateCache map[string]*template.Template
+	session       *sessions.Session
 }
 
 func main() {
