@@ -27,12 +27,19 @@ func main() {
 	addr := flag.String("addr", "", "HTTP network address")
 	blogDSN := flag.String("dsn", os.Getenv("it_blog_DB_DSN"), "Blog PostgreSQL DSN")
 
+	secret := flag.String("secret", "s6Ndh+pPbnzHbS*+9Pk8qGWhTzbpa@ge", "Secret key")
+
 	flag.Parse()
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
 	// Open blog database connection
 	blogDB, err := openDB(*blogDSN)
+
+	session := sessions.New([]byte(*secret))
+	session.Lifetime = 12 * time.Hour
+	session.Secure = true
+
 	if err != nil {
 		logger.Error("failed to open blog database", "error", err.Error())
 		os.Exit(1)
@@ -52,6 +59,7 @@ func main() {
 		blog:          &data.BlogModel{DB: blogDB},
 		users:         &data.UserModel{DB: blogDB},
 		templateCache: templateCache,
+		session:       session,
 	}
 
 	err = app.serve()

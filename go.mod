@@ -9,5 +9,5 @@ require (
 
 require (
 	github.com/golangcollege/sessions v1.2.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
 )

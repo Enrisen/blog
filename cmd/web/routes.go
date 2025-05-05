@@ -10,12 +10,6 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 	mux.HandleFunc("GET /{$}", app.blogPage)
 
-	standardMiddleware := alice.New(
-		app.recoverPanicMiddleware,
-		app.logRequestMiddleware,
-		securityHeaderMiddleware,
-	)
-
 	// Blog post routes
 	mux.HandleFunc("GET /blog/view/{id}", app.blogView)
 	mux.HandleFunc("GET /blog/create", app.blogCreateForm)
@@ -27,8 +21,6 @@ func (app *application) routes() http.Handler {
 	// User registration routes
 	mux.HandleFunc("GET /user/register", app.userRegisterForm)
 	mux.HandleFunc("POST /user/register", app.userRegisterSubmit)
-
-	dynamicMiddleware := application.New(app.session.Enable)
 
 	return app.loggingMiddleware(mux)
 }

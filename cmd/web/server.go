@@ -16,5 +16,5 @@ func (app *application) serve() error {
 		ErrorLog:     slog.NewLogLogger(app.logger.Handler(), slog.LevelError),
 	}
 	app.logger.Info("starting server", "addr", srv.Addr)
-	return srv.ListenAndServe()
+	return srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 }
