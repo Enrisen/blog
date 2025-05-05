@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"html/template"
@@ -21,6 +22,7 @@ type application struct {
 	users         *data.UserModel
 	templateCache map[string]*template.Template
 	session       *sessions.Session
+	TLSConfig     *tls.Config
 }
 
 func main() {
@@ -39,6 +41,12 @@ func main() {
 	session := sessions.New([]byte(*secret))
 	session.Lifetime = 12 * time.Hour
 	session.Secure = true
+
+	//elliptic curve
+	tlsConfig := &tls.Config{
+		PreferServerCipherSuites: true,
+		CurvePreferences:         []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
 
 	if err != nil {
 		logger.Error("failed to open blog database", "error", err.Error())
@@ -60,6 +68,7 @@ func main() {
 		users:         &data.UserModel{DB: blogDB},
 		templateCache: templateCache,
 		session:       session,
+		TLSConfig:     tlsConfig,
 	}
 
 	err = app.serve()
