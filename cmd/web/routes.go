@@ -18,9 +18,11 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("POST /blog/edit/{id}", app.blogEditSubmit)
 	mux.HandleFunc("POST /blog/delete/{id}", app.blogDelete)
 
-	// User registration routes
+	// User routes
 	mux.HandleFunc("GET /user/register", app.userRegisterForm)
 	mux.HandleFunc("POST /user/register", app.userRegisterSubmit)
+	mux.HandleFunc("GET /user/login", app.userLoginForm)
+	mux.HandleFunc("POST /user/login", app.userLoginSubmit)
 
 	return app.loggingMiddleware(mux)
 }

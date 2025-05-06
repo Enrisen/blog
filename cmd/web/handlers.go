@@ -460,3 +460,75 @@ func (app *application) blogDelete(w http.ResponseWriter, r *http.Request) {
 	// Redirect to the blog page
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
+// userLoginForm displays the user login form
+func (app *application) userLoginForm(w http.ResponseWriter, r *http.Request) {
+	data := NewTemplateData()
+	data.Title = "Login | TechSphere"
+	data.HeaderText = "Log In to Your Account"
+
+	err := app.render(w, http.StatusOK, "user_login.tmpl", data)
+	if err != nil {
+		app.logger.Error("failed to render user login page", "template", "user_login.tmpl", "error", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
+}
+
+// userLoginSubmit processes the user login form submission
+func (app *application) userLoginSubmit(w http.ResponseWriter, r *http.Request) {
+	// Parse the form data
+	err := r.ParseForm()
+	if err != nil {
+		app.logger.Error("failed to parse login form", "error", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	// Extract form values
+	email := r.PostForm.Get("email")
+	password := r.PostForm.Get("password")
+
+	// Initialize form data and errors
+	data := NewTemplateData()
+	data.Title = "Login | TechSphere"
+	data.HeaderText = "Log In to Your Account"
+	data.FormData = map[string]string{
+		"email": email,
+	}
+
+	// Validate form inputs using the validator
+	v := validator.NewValidator()
+	appdata.ValidateLogin(v, email, password)
+
+	// If there are validation errors, re-render the form
+	if !v.ValidData() {
+		data.FormErrors = v.Errors
+		err = app.render(w, http.StatusUnprocessableEntity, "user_login.tmpl", data)
+		if err != nil {
+			app.logger.Error("failed to render user login page with errors", "error", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Authenticate the user
+	user, err := app.users.Authenticate(email, password)
+	if err != nil {
+		// Create a new validator for the authentication error
+		v := validator.NewValidator()
+		v.AddError("email", "Invalid email or password")
+		data.FormErrors = v.Errors
+		err = app.render(w, http.StatusUnprocessableEntity, "user_login.tmpl", data)
+		if err != nil {
+			app.logger.Error("failed to render user login page with authentication error", "error", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// TODO: Set up a session for the authenticated user
+	app.logger.Info("user logged in successfully", "user_id", user.ID, "email", user.Email)
+
+	// Redirect to the home page
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}

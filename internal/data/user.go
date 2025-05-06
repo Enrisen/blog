@@ -26,6 +26,45 @@ type UserModel struct {
 	DB *sql.DB
 }
 
+// Authenticate verifies a user's credentials
+func (m *UserModel) Authenticate(email, password string) (*User, error) {
+	// Query for the user with the provided email
+	query := `
+		SELECT user_id, name, email, password_hash, created_at
+		FROM users
+		WHERE email = $1`
+
+	var user User
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	err := m.DB.QueryRowContext(ctx, query, email).Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.HashedPassword,
+		&user.CreatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("invalid credentials")
+		}
+		return nil, err
+	}
+
+	// Check if the provided password matches the stored hash
+	err = bcrypt.CompareHashAndPassword(user.HashedPassword, []byte(password))
+	if err != nil {
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			return nil, errors.New("invalid credentials")
+		}
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 // RegisterUser handles user registration including validation
 func (m *UserModel) RegisterUser(name, email, password, confirmPassword string) (*User, error) {
 	// Create a new user
@@ -88,4 +127,14 @@ func ValidateUserRegistration(v *validator.Validator, name, email, password, con
 	// Validate password confirmation
 	v.Check(validator.NotBlank(confirmPassword), "confirm_password", "Please confirm your password")
 	v.Check(password == confirmPassword, "confirm_password", "Passwords do not match")
+}
+
+// ValidateLogin validates the login form data
+func ValidateLogin(v *validator.Validator, email, password string) {
+	// Validate email
+	v.Check(validator.NotBlank(email), "email", "Email cannot be empty")
+	v.Check(validator.IsValidEmail(email), "email", "Please enter a valid email address")
+
+	// Validate password
+	v.Check(validator.NotBlank(password), "password", "Password cannot be empty")
 }
