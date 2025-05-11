@@ -38,9 +38,10 @@ func main() {
 	// Open blog database connection
 	blogDB, err := openDB(*blogDSN)
 
+	// Initialize the session manager
 	session := sessions.New([]byte(*secret))
 	session.Lifetime = 12 * time.Hour
-	session.Secure = true
+	session.Secure = true // Only send cookies over HTTPS
 
 	//elliptic curve
 	tlsConfig := &tls.Config{

@@ -16,6 +16,9 @@ type TemplateData struct {
 	Categories         []*data.Category // All available categories for sidebar/forms
 	SelectedCategories map[string]bool  // Map of category names that are selected for a post (for edit form)
 	CSRFToken          string           // Add CSRF token field
+	Flash              string           // Flash message for notifications
+	IsAuthenticated    bool             // Whether the user is authenticated
+	UserName           string           // Name of the authenticated user
 }
 
 func NewTemplateData() *TemplateData {
@@ -30,5 +33,8 @@ func NewTemplateData() *TemplateData {
 		RelatedPosts:       []*data.Post{},     // Initialize RelatedPosts
 		Categories:         []*data.Category{}, // Initialize Categories
 		SelectedCategories: map[string]bool{},  // Initialize SelectedCategories
+		Flash:              "",                 // Initialize Flash
+		IsAuthenticated:    false,              // Initialize IsAuthenticated
+		UserName:           "",                 // Initialize UserName
 	}
 }

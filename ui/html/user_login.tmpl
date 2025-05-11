@@ -27,7 +27,7 @@
                     <a href="#" class="nav-link text-gray-600 hover:text-primary">About</a>
                     <a href="#" class="nav-link text-gray-600 hover:text-primary">Contact</a>
                     <!-- Register Button -->
-                    <a href="/user/register" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors">
+                    <a href="/user/register" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
                         Register
                     </a>
                 </nav>
@@ -46,7 +46,7 @@
                     <a href="#" class="py-2 text-gray-600 hover:text-primary border-b border-gray-200">About</a>
                     <a href="#" class="py-2 text-gray-600 hover:text-primary border-b border-gray-200">Contact</a>
                     <!-- Register Button for Mobile -->
-                    <a href="/user/register" class="py-2 text-center bg-primary text-white rounded-md hover:bg-primary-dark transition-colors mt-2">
+                    <a href="/user/register" class="py-2 text-center bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors mt-2">
                         Register
                     </a>
                 </nav>
@@ -71,7 +71,7 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-sm text-red-700">
-                                Please correct the errors below.
+                                Invalid Email or Password.
                             </p>
                         </div>
                     </div>
@@ -98,11 +98,15 @@
                     </div>
 
                     <div>
-                        <button type="submit" class="bg-primary hover:bg-primary-dark font-bold py-3 px-8 rounded-lg transition bg-green-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg transition">
                             Log In
                         </button>
                     </div>
                 </form>
+
+                <div class="mt-6 text-center text-sm">
+                    <p>Don't have an account? <a href="/user/register" class="text-green-500 hover:underline">Register here</a></p>
+                </div>
             </div>
         </div>
     </div>
