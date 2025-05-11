@@ -12,6 +12,7 @@ import (
 type Post struct {
 	ID         int64     `json:"id"`
 	AuthorID   int64     `json:"author_id"`
+	AuthorName string    `json:"author_name"` // Added field for author name
 	Title      string    `json:"title"`
 	Content    string    `json:"content"`
 	Excerpt    string    `json:"excerpt"`
@@ -22,7 +23,7 @@ type Post struct {
 
 // Category represents a single category in the database.
 type Category struct {
-	ID   int64  `json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -32,8 +33,9 @@ type BlogModel struct {
 
 func (m *BlogModel) GetAll() ([]*Post, error) {
 	query := `
-		SELECT p.post_id, p.author_id, p.title, p.content, p.excerpt, p.view_count, p.created_at
+		SELECT p.post_id, p.author_id, u.name, p.title, p.content, p.excerpt, p.view_count, p.created_at
 		FROM posts p
+		JOIN users u ON p.author_id = u.user_id
 		ORDER BY p.created_at DESC`
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -52,6 +54,7 @@ func (m *BlogModel) GetAll() ([]*Post, error) {
 		err := rows.Scan(
 			&p.ID,
 			&p.AuthorID,
+			&p.AuthorName,
 			&p.Title,
 			&p.Content,
 			&p.Excerpt,
@@ -122,7 +125,7 @@ func (m *BlogModel) CreatePost(authorID int64, title, content string, categories
 	if len(categories) > 0 {
 		for _, category := range categories {
 			// First check if the category exists
-			var categoryID int64
+			var categoryID int
 			err = tx.QueryRowContext(
 				ctx,
 				`SELECT category_id FROM categories WHERE name = $1`,
@@ -201,8 +204,9 @@ func (m *BlogModel) getPostCategories(postID int64) ([]string, error) {
 // Get retrieves a single blog post by ID
 func (m *BlogModel) Get(id int64) (*Post, error) {
 	query := `
-		SELECT p.post_id, p.author_id, p.title, p.content, p.excerpt, p.view_count, p.created_at
+		SELECT p.post_id, p.author_id, u.name, p.title, p.content, p.excerpt, p.view_count, p.created_at
 		FROM posts p
+		JOIN users u ON p.author_id = u.user_id
 		WHERE p.post_id = $1`
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -213,6 +217,7 @@ func (m *BlogModel) Get(id int64) (*Post, error) {
 	err := m.DB.QueryRowContext(ctx, query, id).Scan(
 		&post.ID,
 		&post.AuthorID,
+		&post.AuthorName,
 		&post.Title,
 		&post.Content,
 		&post.Excerpt,
@@ -295,7 +300,7 @@ func (m *BlogModel) UpdatePost(id int64, title, content string, categories []str
 	if len(categories) > 0 {
 		for _, category := range categories {
 			// First check if the category exists
-			var categoryID int64
+			var categoryID int
 			err = tx.QueryRowContext(
 				ctx,
 				`SELECT category_id FROM categories WHERE name = $1`,

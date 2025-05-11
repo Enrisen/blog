@@ -13,10 +13,13 @@ var bufferPool = sync.Pool{
 	},
 }
 
-func (app *application) render(w http.ResponseWriter, status int, page string, data *TemplateData) error {
+func (app *application) render(w http.ResponseWriter, r *http.Request, status int, page string, data *TemplateData) error {
 	buf := bufferPool.Get().(*bytes.Buffer)
 	buf.Reset()
 	defer bufferPool.Put(buf)
+
+	// Add default data to the template data
+	data = app.addDefaultData(r, data)
 
 	ts, ok := app.templateCache[page]
 	if !ok {
@@ -41,6 +44,37 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 	}
 
 	return nil
+}
+
+// addDefaultData adds default data to the template data
+func (app *application) addDefaultData(r *http.Request, data *TemplateData) *TemplateData {
+	// If no data was passed, initialize a new empty TemplateData
+	if data == nil {
+		data = NewTemplateData()
+	}
+
+	// Add flash message to the template data if one exists
+	data.Flash = app.session.PopString(r, "flash")
+
+	// Add authentication status to the template data
+	userID := app.session.GetInt(r, "authenticatedUserID")
+	if userID > 0 {
+		data.IsAuthenticated = true
+		data.UserName = app.session.GetString(r, "userName")
+
+		// Log authentication status for debugging
+		app.logger.Info("User is authenticated",
+			"userID", userID,
+			"userName", data.UserName,
+			"path", r.URL.Path)
+	} else {
+		// Log that user is not authenticated
+		app.logger.Info("User is not authenticated",
+			"path", r.URL.Path,
+			"session_data", app.session.Exists(r, "authenticatedUserID"))
+	}
+
+	return data
 }
 
 // serverError logs the detailed error message and sends a generic 500 Internal Server Error response to the client.

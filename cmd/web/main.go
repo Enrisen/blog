@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"html/template"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Enrisen/blog/internal/data"
+	"github.com/golangcollege/sessions"
 	_ "github.com/lib/pq"
 )
 
@@ -19,11 +21,15 @@ type application struct {
 	blog          *data.BlogModel
 	users         *data.UserModel
 	templateCache map[string]*template.Template
+	session       *sessions.Session
+	TLSConfig     *tls.Config
 }
 
 func main() {
 	addr := flag.String("addr", "", "HTTP network address")
 	blogDSN := flag.String("dsn", os.Getenv("it_blog_DB_DSN"), "Blog PostgreSQL DSN")
+
+	secret := flag.String("secret", "s6Ndh+pPbnzHbS*+9Pk8qGWhTzbpa@ge", "Secret key")
 
 	flag.Parse()
 
@@ -31,6 +37,18 @@ func main() {
 
 	// Open blog database connection
 	blogDB, err := openDB(*blogDSN)
+
+	// Initialize the session manager
+	session := sessions.New([]byte(*secret))
+	session.Lifetime = 12 * time.Hour
+	session.Secure = true // Only send cookies over HTTPS
+
+	//elliptic curve
+	tlsConfig := &tls.Config{
+		PreferServerCipherSuites: true,
+		CurvePreferences:         []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
+
 	if err != nil {
 		logger.Error("failed to open blog database", "error", err.Error())
 		os.Exit(1)
@@ -50,6 +68,8 @@ func main() {
 		blog:          &data.BlogModel{DB: blogDB},
 		users:         &data.UserModel{DB: blogDB},
 		templateCache: templateCache,
+		session:       session,
+		TLSConfig:     tlsConfig,
 	}
 
 	err = app.serve()
