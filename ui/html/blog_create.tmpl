@@ -81,6 +81,7 @@
 
             <div class="bg-white rounded-lg shadow-md p-8">
                 <form action="/blog/create" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                     <!-- Title Field -->
                     <div class="mb-6">
                         <label for="title" class="block text-gray-700 font-medium mb-2">Post Title</label>

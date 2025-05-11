@@ -25,6 +25,6 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /blog/edit/{id}", app.requireAuthentication(http.HandlerFunc(app.blogEditSubmit)))
 	mux.Handle("POST /blog/delete/{id}", app.requireAuthentication(http.HandlerFunc(app.blogDelete)))
 
-	// Apply session middleware and then logging middleware
-	return app.loggingMiddleware(app.session.Enable(mux))
+	// Apply session middleware, then noSurf, and finally logging middleware
+	return app.loggingMiddleware(app.session.Enable(noSurf(mux)))
 }

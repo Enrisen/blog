@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+
+	"github.com/justinas/nosurf"
 )
 
 var bufferPool = sync.Pool{
@@ -55,6 +57,9 @@ func (app *application) addDefaultData(r *http.Request, data *TemplateData) *Tem
 
 	// Add flash message to the template data if one exists
 	data.Flash = app.session.PopString(r, "flash")
+
+	// Add CSRF token to the template data
+	data.CSRFToken = nosurf.Token(r)
 
 	// Add authentication status to the template data
 	userID := app.session.GetInt(r, "authenticatedUserID")
